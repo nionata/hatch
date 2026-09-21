@@ -1,0 +1,6 @@
+[toolchain]
+# Espressif's Rust fork for Xtensa (classic ESP32 / S2 / S3).
+# Installed by: espup install
+# Activated by: source ~/export-esp.sh
+channel = "esp"
+targets = ["xtensa-esp32-none-elf", "xtensa-esp32-espidf"]

@@ -1,0 +1,7 @@
+# Espressif Xtensa Rust toolchain (installed by espup via nix devShell)
+.rustup/
+.espup/
+.export-esp.sh
+
+# Cargo build artifacts
+target/
