@@ -32,6 +32,12 @@
           # JTAG/SWD debugging
           probe-rs-tools
 
+          # rust-analyzer from nixpkgs since the esp toolchain doesn't ship one.
+          # TODO: infinite recursion when rustup proxy and nixpkgs binary are both
+          # on PATH — RA crashes on startup. Needs investigation into PATH ordering
+          # or a RUSTUP_TOOLCHAIN override to break the cycle.
+          rust-analyzer
+
           # Generate new crates from esp-rs templates
           cargo-generate
 
@@ -65,6 +71,9 @@
           if [ -f "$PWD/.export-esp.sh" ]; then
             source "$PWD/.export-esp.sh"
           fi
+
+          # Point rust-analyzer at the esp toolchain's stdlib source
+          export RUST_SRC_PATH="$RUSTUP_HOME/toolchains/esp/lib/rustlib/src/rust/library"
 
           echo "hatch ESP32 dev shell — toolchain: $(rustup show active-toolchain 2>/dev/null || echo 'esp')"
         '';
