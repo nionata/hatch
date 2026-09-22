@@ -15,6 +15,11 @@
     {
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
+          # Add rust-analyzer before the rustup rust-analyzer shim to avoid infinit recursion.
+          # There is no rust-analyzer in the esp toolchain. The rustup shim will try to fallback
+          # to other packages on the path. It will only find itself and death spiral.
+          rust-analyzer
+
           # rustup is required by espup to install and manage the esp toolchain.
           # RUSTUP_HOME is scoped to the project directory below.
           rustup
@@ -31,12 +36,6 @@
 
           # JTAG/SWD debugging
           probe-rs-tools
-
-          # rust-analyzer from nixpkgs since the esp toolchain doesn't ship one.
-          # TODO: infinite recursion when rustup proxy and nixpkgs binary are both
-          # on PATH — RA crashes on startup. Needs investigation into PATH ordering
-          # or a RUSTUP_TOOLCHAIN override to break the cycle.
-          rust-analyzer
 
           # Generate new crates from esp-rs templates
           cargo-generate
