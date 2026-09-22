@@ -30,24 +30,6 @@
 
           # Flash firmware to the device over USB/serial
           espflash
-
-          # Linker proxy required by esp-idf-sys (both std and no_std)
-          ldproxy
-
-          # JTAG/SWD debugging
-          probe-rs-tools
-
-          # Generate new crates from esp-rs templates
-          cargo-generate
-
-          # ESP-IDF std builds need these to compile the C SDK
-          cmake
-          ninja
-          python3
-
-          # General build tooling
-          pkg-config
-          git
         ];
 
         # Required for esp-idf-sys to locate libclang when generating bindings
