@@ -1,6 +1,6 @@
 {
     "parameterSets": {
-        "design default values": {
+        "v1": {
             "$fn": "48",
             "barrel_clear": "0.4",
             "barrel_d": "11.1",
@@ -29,12 +29,12 @@
             "post_hole_insert": "4.2",
             "post_hole_self": "2.6",
             "post_od": "7.5",
-            "side_gap": "1.5",
+            "side_gap": "25",
             "standoff_h": "7",
             "standoff_hole_d": "1.8",
             "standoff_hole_depth": "7.5",
             "standoff_od": "5",
-            "term_gap": "14",
+            "term_gap": "28",
             "top_clear": "2",
             "usb_h": "10.5",
             "usb_w": "15",
