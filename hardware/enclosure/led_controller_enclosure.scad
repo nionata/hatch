@@ -21,7 +21,7 @@ $fn = 48;
 part = "print";
 
 /* [Protoboard] */
-board_l          = 69.95;       // X length (69.85)
+board_l          = 69.85;       // X length (69.85)
 board_w          = 50.8;        // Y width  (50.8)
 board_t          = 1.6;
 board_hole_inset = 2.5;         // ** MEASURE ** corner hole center from board edges
