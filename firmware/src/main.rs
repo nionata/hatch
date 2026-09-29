@@ -28,9 +28,10 @@ fn main() -> ! {
         .unwrap();
 
     loop {
-        let mut colors = [RGB8::default(); NUM_LEDS];
-        colors[0] = RGB8::new(10, 0, 0);
-        let _ = led.write(colors.iter().copied());
+        let colors = [RGB8::new(0, 100, 0); NUM_LEDS];
+        let brightness = 255;
+        let b = smart_leds::brightness(colors.iter().copied(), brightness);
+        let _ = led.write(b);
         delay.delay_millis(1000u32);
     }
 }
