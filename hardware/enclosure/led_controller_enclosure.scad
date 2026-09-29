@@ -21,11 +21,11 @@ $fn = 48;
 part = "print";
 
 /* [Protoboard] */
-board_l          = 2.75 * in;   // X length (69.85)
-board_w          = 2.0  * in;   // Y width  (50.8)
+board_l          = 69.95;       // X length (69.85)
+board_w          = 50.8;        // Y width  (50.8)
 board_t          = 1.6;
 board_hole_inset = 2.5;         // ** MEASURE ** corner hole center from board edges
-comp_h           = 5/8 * in;    // tallest thing above board top (headers/terminal screws)
+comp_h           = 15.875;    // tallest thing above board top (headers/terminal screws)
 
 /* [Board standoffs (M2)] */
 standoff_h          = 7;    // room for solder joints + wiring UNDER the board
