@@ -5,3 +5,7 @@
 
 # Cargo build artifacts
 target/
+
+# 3d printing
+*.stl
+*.3mf
