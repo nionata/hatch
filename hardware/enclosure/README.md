@@ -1,5 +1,25 @@
 # Enclosure
 
+## Dimensions
+
+* Barrel connector
+  * 9.77mm barrel plug diameter
+  * 2.02mm panel flange width
+  * 13.7mm nut width
+* JST SM
+  * 7.47mm height
+  * 10.47mm width
+  * 8.11mm panel flange width
+* Proto board ("5x7cm")
+  * 68.68mm l
+  * 48.70mm w
+  * 2mm from center of screw hole to side of board
+* Micro USB
+  * 8.03mm width
+  * 2.95mm height
+* ESP32
+  * mounted on proto board from columns D5 to D15 and rows H through X
+
 ## v0
 
 Things to fix:
