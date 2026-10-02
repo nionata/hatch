@@ -1,5 +1,7 @@
 # Enclosure
 
+I am building an enclosure for an ESP32 on a proto board. It is an esp32 classic. I have two screw terminals on the board. A 2pin on the left corner connected to a panel-mounted barrel plug and a 3pin on the right corner connected to a JST SM LED connector that will be panel-mounted as well. On the opposite side of the enclosure is the Micro USB for the esp32. We need plenty of room for the wires to go from the peel-mount to then feed into the screw terminals. Below are dimensions. Help me design this thing. I’d also like to be able to do a test print on small parts like the proto board mounts to make sure they fit before printing the entire enclosure.
+
 ## Dimensions
 
 * Barrel connector
@@ -13,12 +15,17 @@
 * Proto board ("5x7cm")
   * 68.68mm l
   * 48.70mm w
-  * 2mm from center of screw hole to side of board
-* Micro USB
-  * 8.03mm width
-  * 2.95mm height
+  * 44mm from inner hole to hole w
+  * 63.75mm from inner hole to hole l
+  * 2.34mm diameter of hole
 * ESP32
-  * mounted on proto board from columns D5 to D15 and rows H through X
+  * mounted on proto board from columns D5 to D15 and rows H through 
+  * hangs over 3.175mm past the bottom of the protoboard board, mount flush
+  * Micro USB
+    * 8.03mm width
+    * 2.95mm height
+    * doesn't hang much over the esp32 board
+
 
 ## v0
 

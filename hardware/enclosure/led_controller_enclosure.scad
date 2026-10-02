@@ -15,16 +15,19 @@ in = 25.4;
 $fn = 48;
 
 /* [Which part to output] */
-// "print"   = box + lid laid out for printing (lid flipped)
-// "box"     = box only, "lid" = lid only
-// "preview" = assembled view with ghost board, lid lifted
-part = "print";
+// "print"               = box + lid laid out for printing (lid flipped)
+// "box"                 = box only, "lid" = lid only
+// "preview"             = assembled view with ghost board, lid lifted
+// "board"               = protoboard + ESP32 only (check model before enclosure)
+// "standoff_test"       = thin slab + 4 standoffs only (export/print this)
+// "standoff_test_ghost" = same slab with transparent board overlay for preview
+part = "preview";
 
 /* [Protoboard] */
-board_l          = 69.85;       // X length (69.85)
-board_w          = 50.8;        // Y width  (50.8)
+board_l          = 68.68;       // X length (measured)
+board_w          = 48.70;       // Y width  (measured)
 board_t          = 1.6;
-board_hole_inset = 2.5;         // ** MEASURE ** corner hole center from board edges
+board_hole_inset = 2.0;         // corner hole center from board edges (measured)
 comp_h           = 15.875;    // tallest thing above board top (headers/terminal screws)
 
 /* [Board standoffs (M2)] */
@@ -76,7 +79,25 @@ usb_h            = 10.5;
 usb_z_above_board= 8;    // ** MEASURE ** USB center above board top (depends on header height)
 usb_y_offset     = 0;    // shift if ESP32 isn't centered across the board
 
+/* [ESP32 dev board (for preview ghost — ** MEASURE **)] */
+hole_pitch       = 2.54;
+show_board_holes = false;   // hole grid CSG is slow; enable only when needed
+esp_l            = 55.0;    // PCB length (USB end to antenna end)
+esp_w            = 28.2;    // PCB width
+esp_t            = 1.2;     // PCB thickness
+esp_usb_protrude = 0.5;     // how far USB shell sticks past PCB edge (+X)
+esp_usb_phys_w   = 7.5;     // micro-USB shell width
+esp_usb_phys_h   = 3.2;     // micro-USB shell height above PCB
+esp_overhang     = 3.175;   // ESP32 PCB hangs past +X board edge (measured)
+esp_cols_left    = 4;       // protoboard cols visible to the left of the ESP32
+
 // ---------------- derived ----------------
+// hole-grid origin (mirrors protoboard module so esp_py lines up exactly)
+_hole_ny = round(board_w / hole_pitch) - 1;
+_hole_y0 = (board_w - (_hole_ny - 1) * hole_pitch) / 2;
+esp_px   = board_l - esp_l + esp_overhang;
+esp_py   = _hole_y0 + esp_cols_left * hole_pitch;
+
 int_l   = term_gap + board_l + end_gap;
 int_w   = board_w + 2 * side_gap;
 int_h   = standoff_h + board_t + comp_h + top_clear;
@@ -180,14 +201,47 @@ module lid() {
   }
 }
 
+// ---------------- board detail modules (used in preview) ----------------
+module protoboard() {
+  nx = round(board_l / hole_pitch) - 1;
+  ny = round(board_w / hole_pitch) - 1;
+  x0 = (board_l - (nx - 1) * hole_pitch) / 2;
+  y0 = (board_w - (ny - 1) * hole_pitch) / 2;
+  difference() {
+    color([0.13, 0.50, 0.13], 0.88) cube([board_l, board_w, board_t]);
+    // hole grid (disabled by default — enable show_board_holes when needed)
+    if (show_board_holes)
+      for (c = [0:nx-1], r = [0:ny-1])
+        translate([x0 + c * hole_pitch, y0 + r * hole_pitch, -0.5])
+          cylinder(d = 1.0, h = board_t + 1, $fn = 6);
+    // M2 corner mounting holes
+    for (dx = [board_hole_inset, board_l - board_hole_inset],
+         dy = [board_hole_inset, board_w - board_hole_inset])
+      translate([dx, dy, -0.5]) cylinder(d = 2.5, h = board_t + 1, $fn = 12);
+  }
+}
+
+module esp32_detail() {
+  translate([esp_px, esp_py, board_t]) {
+    // PCB
+    color([0.05, 0.05, 0.40], 0.85) cube([esp_l, esp_w, esp_t]);
+    // micro-USB connector at the +X end
+    color("silver", 0.9)
+      translate([esp_l - 3, (esp_w - esp_usb_phys_w) / 2, esp_t])
+        cube([3 + esp_usb_protrude, esp_usb_phys_w, esp_usb_phys_h]);
+    // metal antenna can at the -X end
+    color([0.75, 0.75, 0.75], 0.85)
+      translate([0, (esp_w - 16) / 2, esp_t])
+        cube([16, 16, 3.5]);
+  }
+}
+
 // ---------------- preview ghosts ----------------
 module ghost() {
   translate([wall + bx, wall + by, floor_t + standoff_h]) {
-    color("green", 0.5) cube([board_l, board_w, board_t]);
-    color("red", 0.15) translate([0, 0, board_t]) cube([board_l, board_w, comp_h]);
-    // ESP32 USB end overhang
-    color("blue", 0.4) translate([board_l, board_w / 2 - 4 + usb_y_offset, board_t + usb_z_above_board - 2])
-      cube([1/8 * in, 8, 4]);
+    protoboard();
+    esp32_detail();
+    color("orange", 0.07) translate([0, 0, board_t]) cube([board_l, board_w, comp_h]);
   }
 }
 
@@ -197,7 +251,42 @@ else if (part == "lid") translate([0, 0, lid_t]) rotate([180, 0, 0]) translate([
 else if (part == "preview") {
   box();
   ghost();
-  translate([0, 0, box_h + 12]) lid();
+  translate([0, -10, lid_t]) rotate([180, 0, 0]) lid();
+} else if (part == "board") {
+  protoboard();
+  esp32_detail();
+} else if (part == "standoff_test") {
+  // Slab is exactly board size — place the real board flush with the slab edges.
+  _test_pts = [for (p = standoff_pts) [p[0] - bx, p[1] - by]];
+  _tb = 6;  // border width — keeps full material under each standoff base
+  difference() {
+    union() {
+      cube([board_l, board_w, floor_t]);
+      for (p = _test_pts)
+        translate([p[0], p[1], floor_t]) cylinder(d = standoff_od, h = standoff_h);
+    }
+    // hollow out center
+    translate([_tb, _tb, -1]) cube([board_l - 2*_tb, board_w - 2*_tb, floor_t + 2]);
+    for (p = _test_pts)
+      translate([p[0], p[1], floor_t + standoff_h - standoff_hole_depth])
+        cylinder(d = standoff_hole_d, h = standoff_hole_depth + 1);
+  }
+} else if (part == "standoff_test_ghost") {
+  _test_pts = [for (p = standoff_pts) [p[0] - bx, p[1] - by]];
+  _tb = 6;
+  difference() {
+    union() {
+      cube([board_l, board_w, floor_t]);
+      for (p = _test_pts)
+        translate([p[0], p[1], floor_t]) cylinder(d = standoff_od, h = standoff_h);
+    }
+    translate([_tb, _tb, -1]) cube([board_l - 2*_tb, board_w - 2*_tb, floor_t + 2]);
+    for (p = _test_pts)
+      translate([p[0], p[1], floor_t + standoff_h - standoff_hole_depth])
+        cylinder(d = standoff_hole_d, h = standoff_hole_depth + 1);
+  }
+  translate([0, 0, floor_t + standoff_h])
+    color([0.13, 0.50, 0.13], 0.35) cube([board_l, board_w, board_t]);
 } else {
   box();
   // lid flipped (lip up, countersinks on the bed), placed beside the box
